@@ -1,16 +1,12 @@
-export type ValidationValue = null | undefined | number| number[] | string | string[] | Date | Date[] | Object;
+import {ruleNames} from "./value-validation-functions";
 
-export interface ValidationRules {
-    required?: { value: boolean };
-    email?: { value: boolean };
-    maxLength?: { value: number };
-}
+type ValidationRuleName = typeof ruleNames[number];
 
-type ValidationRuleName = keyof ValidationRules;
+export type ValidationRules = {
+    [key in ValidationRuleName]?: { value: boolean | number; };
+};
+
+export type ValidationResults = [ValidationRuleName,boolean][];
+
 type ValidationRuleOption = Exclude<ValidationRules[keyof ValidationRules], undefined>;
-
-type ValidationResult = { [key in ValidationRuleName as string]: boolean };
-
-type ValidationFn = (s: ValidationRuleOption) => (v: ValidationValue) => boolean;
-
-type ValueValidator = (val: ValidationValue) => boolean;
+export type ValidatorFunction=(val:any)=>boolean;

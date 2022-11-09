@@ -8,8 +8,8 @@ export class Maybe<T> implements Monad<T>{
     private readonly isNothing: boolean;
     constructor(val: T) {
         this.value = val;
-        this.isNothing = !val || (Array.isArray(val) && !(val as Array<any>).length) || typeof val !== 'function' && !Object.keys(val as Object).length;
-        // console.log(this.value);
+        //don't forget the value can be boolean so don't use truthy check on val like !val
+        this.isNothing = (val===undefined) || (val===null);
     }
     private join() {
         return this.value;
@@ -55,36 +55,13 @@ export class Maybe<T> implements Monad<T>{
         }
         return otherMaybe.map(this.value as (val:T)=>unknown);
     }
-    /**
-     * orElse :: Monad m => m a -> a -> m a
-     */
-    orElse(def: T) {
-        if (this.isNothing) {
-            return Maybe.of(def);
+    fork(fN:()=>any,fS:(val:T)=>any){
+        if(this.isNothing){
+            return fN();
         }
-        return this;
-    }
-    /**
-     * If there's a wrapped value then the function will be applied to the value and the return value will be returned
-     */
-    onSome(f: (val:T)=>any) {
-        if (!this.isNothing) {
-            return f(this.value);
-        }
-    }
-    /**
-     * If there's no wrapped value then the function will be called and the return value will be returned
-     */
-    onNothing(f: Function) {
-        if (this.isNothing) {
-            return f();
-        }
+        return fS(this.value);
     }
     static of<T>(val: T) {
         return new Maybe<T>(val);
-    }
-    static Nothing=Symbol("Nothing");
-    emit(){
-        return this.value;
     }
 }
