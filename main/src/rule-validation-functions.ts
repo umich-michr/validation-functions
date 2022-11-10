@@ -16,7 +16,7 @@ function identityValidationFnBuilder(ruleName: ValidationRuleName) {
     return validationFnBuilder(ruleName, () => true)
 }
 
-export function ignoreEmptyInput(validatorFn: ValidatorFunction){
+export function transformToIgnoreEmptyInput(validatorFn: ValidatorFunction){
     return (val: any)=> {
         return Maybe.of(val).map(validatorFn).fork(() => true, (val: any) => val)
     };
@@ -27,8 +27,8 @@ type RuleApplicator = (options: ValidationRuleOption) => (validationState: Valid
 function getRuleApplicator(ruleName: ValidationRuleName, options: ValidationRuleOption): Maybe<(val: any) => ValidationState> {
     const ruleApplicators: { [key in ValidationRuleName]: RuleApplicator } = {
         required: options => options.value ? validationFnBuilder('required', isNotEmpty) : identityValidationFnBuilder('required'),
-        email: options => options.value ? validationFnBuilder('email', ignoreEmptyInput(isEmail)) : identityValidationFnBuilder('required'),
-        maxLength: options => validationFnBuilder('maxLength', ignoreEmptyInput(isLessThan(options.value as number))),
+        email: options => options.value ? validationFnBuilder('email', transformToIgnoreEmptyInput(isEmail)) : identityValidationFnBuilder('required'),
+        maxLength: options => validationFnBuilder('maxLength', transformToIgnoreEmptyInput(isLessThan(options.value as number))),
     }
     return Maybe.of(ruleApplicators[ruleName]).ap(Maybe.of(options)) as Maybe<(val: any) => ValidationState>;
 }

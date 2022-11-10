@@ -49,11 +49,11 @@ export class Maybe<T> implements Monad<T>{
      * when this.value is a function, ap applies that function to the maybe passed as argument and returns the resulting maybe
      * ap :: Monad m => m (a -> b) -> m a -> m b
      */
-    ap(otherMaybe: Monad<any>):Monad<any> {
+    ap(otherMonad: Monad<any>):Monad<any> {
         if(this.isNothing){
-            return this;
+            return otherMonad;
         }
-        return otherMaybe.map(this.value as (val:T)=>unknown);
+        return otherMonad.map(this.value as (val:T)=>unknown);
     }
     fork(fN:()=>any,fS:(val:T)=>any){
         if(this.isNothing){
