@@ -1,25 +1,33 @@
-import test from "tape";
-import {ValidationRuleName, ValidationRules} from "../../../main/src";
-import {prepareValidationTestFor} from "./rule-validation-test-helpers";
+import test from 'tape';
+import {ValidationRuleName, ValidationRules} from '../../../main/src';
+import {testValidationFor} from './rule-validation-test-helpers';
 
 const RULE_NAME: ValidationRuleName = 'required';
-const VALIDATION_RULE: ValidationRules = {[RULE_NAME]:{value:true}};
+const VALIDATION_RULE: ValidationRules = {[RULE_NAME]: {value: true}};
 
-const INVALID_INPUTS = [null, undefined,'','   ',[],{}];
-const VALID_INPUTS = ['a', 5, ()=>{}, ['a'],{a:1}];
+const INVALID_INPUTS = [null, undefined, '', '   ', [], {}];
+const VALID_INPUTS = ['a', 5, ['a'], {a: 1}];
+const NOT_SUPPORTED_INPUTS = [() => {}, Symbol()];
 
-test(`${RULE_NAME} validation should return false for empty values: ${JSON.stringify(INVALID_INPUTS)}`,(assert)=>{
-    const expectedResult = false;
+test(`${RULE_NAME} validation should return true when not enabled for invalid value: ${INVALID_INPUTS[0]}`, (assert) => {
+  const expectedResult = true;
 
-    prepareValidationTestFor(INVALID_INPUTS, VALIDATION_RULE, assert)
-        .setExpectation([[RULE_NAME,expectedResult]])
-        .run();
+  testValidationFor([INVALID_INPUTS[0]], {[RULE_NAME]: {value: false}})
+    .setExpectation([[RULE_NAME, expectedResult]])
+    .assert(assert);
 });
 
-test(`${RULE_NAME} validation should return true for non-empty values: ${JSON.stringify(VALID_INPUTS)}`,(assert)=>{
-    const expectedResult = true;
+test(`${RULE_NAME} validation should return false for empty values: ${JSON.stringify(INVALID_INPUTS)}`, (assert) => {
+  const expectedResult = false;
 
-    prepareValidationTestFor(VALID_INPUTS, VALIDATION_RULE, assert)
-        .setExpectation([[RULE_NAME,expectedResult]])
-        .run();
+  testValidationFor(INVALID_INPUTS, VALIDATION_RULE)
+    .setExpectation([[RULE_NAME, expectedResult]])
+    .assert(assert);
+});
+
+test(`${RULE_NAME} validation should return true for non-empty values: ${JSON.stringify(VALID_INPUTS)}`, (assert) => {
+  const expectedResult = true;
+  testValidationFor(VALID_INPUTS, VALIDATION_RULE)
+    .setExpectation([[RULE_NAME, expectedResult]])
+    .assert(assert);
 });

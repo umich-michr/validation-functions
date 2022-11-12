@@ -8,14 +8,15 @@
  * curriedSum(1)(2)(3); // 6, full currying
  * @param func Function to curry.
  */
+//eslint-disable-next-line @typescript-eslint/ban-types
 export function curry(func: Function) {
-    return function curried(...args: unknown[]) {
-        if (args.length >= func.length) {
-            return func.apply(curried, args);
-        } else {
-            return function(...args2: unknown[]) {
-                return curried.apply(curried, args.concat(args2));
-            }
-        }
-    };
+  return function curried(...args: unknown[]) {
+    if (args.length >= func.length) {
+      return func.apply(curried, args);
+    } else {
+      return function (...args2: unknown[]) {
+        return curried.apply(curried, args.concat(args2));
+      };
+    }
+  };
 }

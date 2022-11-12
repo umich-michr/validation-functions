@@ -1,0 +1,4 @@
+{
+    "pattern": "^(main|test){1}$|^(feature|bug|hotfix|task){1}#\\d+$|^release-\\d+\\.\\d+\\.\\d+$",
+    "errorMsg": "Branch name validate failed please rename your current branch. Branch name should be either one of main or development. If not then it should start with either one of feature,bug,hotfix,task followed by '-' and followed by redmine ticket number. If the branch is for preparing for a release then it should follow release-{release semantic version number} format"
+  }

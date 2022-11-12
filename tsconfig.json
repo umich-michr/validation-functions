@@ -1,7 +1,7 @@
 // See all compiler options -> https://www.typescriptlang.org/docs/handbook/compiler-options.html
 {
   "compilerOptions": {
-    "outDir": "./dist",
+    "outDir": "dist",
     // Target latest version of ECMAScript.
     "target": "es6",
     "module": "esnext",
@@ -9,8 +9,6 @@
     "moduleResolution": "node",
     // Process & infer types from .js files.
     "allowJs": true,
-    // Don't emit; allow Babel to transform files.
-    "noEmit": true,
     // Enable strictest settings like strictNullChecks & noImplicitAny.
     "strict": true,
     // Ensure that Babel can safely transpile files in the TypeScript project. Disallow features that require cross-file information for emit.
@@ -21,6 +19,8 @@
     // Ensure that .d.ts files are created by tsc, but not .js files
     "declaration": true,
     "emitDeclarationOnly": true,
+    "declarationMap": true, // go to js file when using IDE functions like Go to Definition in VSCode,
+    "sourceMap": true
   },
   "exclude": [
     "node_modules",

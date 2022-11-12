@@ -1,49 +1,55 @@
-export const ruleNames = ['required', 'email', 'maxLength'] as const;
-
-function isEmptyString(str: string) {
-    return !str.trim().length;
+function isEmptyString(str: string): boolean {
+  return !str.trim().length;
 }
 
-function isEmptyArray(arr: Array<string | number | Date>) {
-    return !arr?.length;
+function isEmptyArray(arr: Array<string | number | Date>): boolean {
+  return !arr?.length;
 }
 
-function isEmptyObject(obj: Object) {
-    return !Object.keys(obj).length;
+function isEmptyObject(obj: Record<string, unknown>): boolean {
+  return !Object.keys(obj).length;
 }
 
-const validationValueTypes = ['undefined', 'null', 'string', 'number', 'array', 'object', 'function', 'unknown'] as const;
-type ValidationType = typeof validationValueTypes[number];
+const VALUE_TYPES = ['undefined', 'null', 'string', 'number', 'array', 'object', 'function', 'unknown'] as const;
+type ValidationType = typeof VALUE_TYPES[number];
 
+//eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function typeofValue(val: any): ValidationType {
-    return (val === undefined) ? 'undefined'
-        : (val === null) ? 'null'
-            : (typeof val === 'string') ? 'string'
-                : (typeof val === 'number') ? 'number'
-                    : (Array.isArray(val)) ? 'array'
-                        : (typeof val === 'function') ? 'function'
-                            : (Object(val) === val) ? 'object'
-                                : 'unknown';
+  return val === undefined
+    ? 'undefined'
+    : val === null
+    ? 'null'
+    : typeof val === 'string'
+    ? 'string'
+    : typeof val === 'number'
+    ? 'number'
+    : Array.isArray(val)
+    ? 'array'
+    : typeof val === 'function'
+    ? 'function'
+    : Object(val) === val
+    ? 'object'
+    : 'unknown';
 }
 
-export function isNotEmpty(val: null|undefined|[]|{}|''): false;
-export function isNotEmpty(val: any): boolean{
-    switch(typeofValue(val)){
-        case 'string':
-            return !isEmptyString(val);
-        case 'array':
-            return !isEmptyArray(val);
-        case 'object':
-            return !isEmptyObject(val);
-        case 'undefined':
-        case 'null':
-            return false;
-        case 'number':
-        case 'function':
-            return true;
-        default:
-            throw new Error('typeofValue returned unknown type which we dont\'t know how to check if it\'s empty or not');
-    }
+export function isNotEmpty(val: null | undefined | [] | Record<string, unknown> | ''): false;
+export function isNotEmpty(val: unknown): boolean {
+  switch (typeofValue(val)) {
+    case 'string':
+      return !isEmptyString(val as string);
+    case 'array':
+      return !isEmptyArray(val as []);
+    case 'object':
+      return !isEmptyObject(val as Record<string, unknown>);
+    case 'undefined':
+    case 'null':
+      return false;
+    case 'number':
+    case 'function':
+      return true;
+    default:
+      throw new Error("typeofValue returned unknown type which we dont't know how to check if it's empty or not");
+  }
 }
 
 /**
@@ -51,11 +57,34 @@ export function isNotEmpty(val: any): boolean{
  * Regex is courtesy of: David Lott at https://www.regexlib.com/RETester.aspx?regexp_id=88 (tweaked it to pass our tests)
  * @param addr Email address in string format
  */
-export function isEmail(addr: string) {
-    const re = new RegExp(/^$|^([\w\-\+\.]+)@((\[([0-9]{1,3}\.){3}[0-9]{1,3}\])|(([\w\-]+\.)+)([a-zA-Z]{2,4}))$/igm);
-    return re.test(addr);
+export function isEmail(addr: string): boolean {
+  //eslint-disable-next-line no-useless-escape
+  const re = new RegExp(/^$|^([\w\-\+\.]+)@((\[([0-9]{1,3}\.){3}[0-9]{1,3}\])|(([\w\-]+\.)+)([a-zA-Z]{2,4}))$/gim);
+  return re.test(addr);
 }
 
-export function isLessThan(maxLength: number) {
-    return (str: string) => str.length <= maxLength;
+export function isNotMoreThan(maxLength: number) {
+  //eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (val: string | number | any[]): boolean => {
+    switch (typeofValue(val)) {
+      case 'string':
+      case 'array':
+        // @ts-ignore
+        return val.length <= maxLength;
+      case 'object':
+        // @ts-ignore
+        return Object.entries(val).length <= maxLength;
+      case 'undefined':
+      case 'null':
+        return true;
+      case 'number':
+        return val.toString().length <= maxLength;
+      default:
+        throw new Error(
+          `typeofValue returned ${typeofValue(
+            val
+          )} type which we don't know how to check if it's longer than the max limit or not`
+        );
+    }
+  };
 }

@@ -1,0 +1,10 @@
+**/templates/**
+dist/
+coverage/
+docs/
+package-lock.json
+package.json
+yarn.lock
+node_modules
+build
+*.scss
