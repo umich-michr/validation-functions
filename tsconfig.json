@@ -1,5 +1,11 @@
 // See all compiler options -> https://www.typescriptlang.org/docs/handbook/compiler-options.html
 {
+  "include": ["main"],
+  "exclude": [
+    "node_modules",
+    "test",
+    "dist"
+  ],
   "compilerOptions": {
     "outDir": "dist",
     // Target latest version of ECMAScript.
