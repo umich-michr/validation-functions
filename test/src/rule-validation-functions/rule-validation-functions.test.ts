@@ -1,7 +1,7 @@
 import test from 'tape';
 import {RULE_NAMES, validate} from '../../../main/src/rule-validation-functions';
 import {testValidationFor} from './rule-validation-test-helpers';
-import {ValidationResults} from '../../../main/src';
+import {ValidationRuleName} from '../../../main/src';
 
 //validation rules are generated from the constant ruleNames to makes ure whatever rules will be added or discarded can be caught by tests.
 const VALIDATION_RULES = RULE_NAMES.reduce(
@@ -18,7 +18,7 @@ const VALIDATION_RULES = RULE_NAMES.reduce(
 
 test('Given a set of rules with non-existent rules Then validation result should be returned with the results of all validations', (assert) => {
   const INPUTS = [null, undefined, '', [], {}, 'jdoe@gmail.com', 'tooLong@gmail.com', 'aa']; //toString() for [] is empty string and for that reason email validation returns true
-  const EXPECTED_RESULTS: ValidationResults[] = [
+  const EXPECTED_RESULTS: [ValidationRuleName, boolean][][] = [
     [
       ['required', false],
       ['email', true],
@@ -36,7 +36,7 @@ test('Given a set of rules with non-existent rules Then validation result should
     ],
     [
       ['required', false],
-      ['email', true],
+      ['email', false],
       ['maxLength', true]
     ],
     [
@@ -66,6 +66,7 @@ test('Given a set of rules with non-existent rules Then validation result should
 });
 
 test('When unsupported types are passed as argument an exceptions should be thrown', (assert) => {
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   const INPUTS = [() => {}, Symbol()];
   assert.plan(INPUTS.length);
 

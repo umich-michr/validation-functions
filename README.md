@@ -1,0 +1,1 @@
+[![CircleCI](https://dl.circleci.com/status-badge/img/gh/umich-michr/validation-functions/tree/main.svg?style=shield&circle-token=77e5f667b1676ed07512d8b8d6f2d949a66215b9)](https://dl.circleci.com/status-badge/redirect/gh/umich-michr/validation-functions/tree/main)

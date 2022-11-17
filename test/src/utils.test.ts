@@ -3,7 +3,7 @@ import {curry} from '../../main/src/utils';
 
 test('Multiple argument function should be curried=>Turned into single arg functions returning other single argument functions untill all args are passed', (assert) => {
   const sum = (a: number, b: number, c: number) => a + b + c;
-  let curriedSum = curry(sum);
+  const curriedSum = curry(sum);
 
   assert.equals(6, curriedSum(1)(2)(3), 'When all 3 args passed one by one Then return result');
   assert.equals(

@@ -11,7 +11,12 @@ export class Maybe<T> implements Monad<T> {
   constructor(val: T) {
     this.value = val;
     //don't forget the value can be boolean so don't use truthy check on val like !val
-    this.isNothing = val === undefined || val === null || val === '';
+    this.isNothing =
+      val === undefined ||
+      val === null ||
+      val === '' ||
+      (Array.isArray(val) && val.length === 0) ||
+      (typeof val !== 'function' && Object(val) === val && Object.entries(val).length === 0);
   }
 
   static of<T>(val: T) {

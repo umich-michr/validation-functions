@@ -1,31 +1,38 @@
 import {Test} from 'tape';
 import {Validation, ValidationState} from '../../../main/src/Validation';
-import {ValidationResults, ValidationRules} from '../../../main/src';
-import {validate} from '../../../main/src/rule-validation-functions';
+import {ValidationRuleName, ValidationRules} from '../../../main/src';
+import {validate} from '../../../main/src';
 
 function* validationGenerator(
-  valueIterator: IterableIterator<any>,
-  results: ValidationResults | IterableIterator<ValidationState>
+  valueIterator: IterableIterator<unknown>,
+  results: [ValidationRuleName, boolean][] | IterableIterator<ValidationState>
 ): Generator<Validation> {
   const nextVal = valueIterator.next();
   const res = Array.isArray(results) ? results : results.next().value;
   if (nextVal.done) {
     return;
   }
-  yield new Validation(new ValidationState(nextVal.value, res));
+
+  const failed = res.filter((r: unknown[]) => !r[1]).map((r: unknown[]) => r[0]); //!res[0][1] ? [res[0][0]] : [];
+  const success = res.filter((r: unknown[]) => r[1]).map((r: unknown[]) => r[0]);
+  yield new Validation(new ValidationState(nextVal.value, failed, success));
   yield* validationGenerator(valueIterator, results);
 }
 
-function* expectedGenerator(values: any[], results: ValidationResults | ValidationResults[]): Generator<Validation> {
+function* expectedGenerator(
+  values: unknown[],
+  results: [ValidationRuleName, boolean][] | [ValidationRuleName, boolean][][]
+): Generator<Validation> {
   const res = (Array.isArray(results[0][0]) ? results[Symbol.iterator]() : results) as
-    | ValidationResults
+    | [ValidationRuleName, boolean][]
     | IterableIterator<ValidationState>;
   yield* validationGenerator(values[Symbol.iterator](), res);
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function testValidationFor(values: any[], rules: ValidationRules) {
   return {
-    setExpectation(results: ValidationResults | ValidationResults[]) {
+    setExpectation(results: [ValidationRuleName, boolean][] | [ValidationRuleName, boolean][][]) {
       const expectedValidations = expectedGenerator(values, results);
       const validateRule = validate(rules);
       return {

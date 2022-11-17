@@ -1,3 +1,7 @@
+//disabled inspection and eslint for redundant escape because regex is incorrectly identified.
+/* eslint-disable no-useless-escape */
+// noinspection RegExpRedundantEscape
+
 function isEmptyString(str: string): boolean {
   return !str.trim().length;
 }
@@ -58,8 +62,7 @@ export function isNotEmpty(val: unknown): boolean {
  * @param addr Email address in string format
  */
 export function isEmail(addr: string): boolean {
-  //eslint-disable-next-line no-useless-escape
-  const re = new RegExp(/^$|^([\w\-\+\.]+)@((\[([0-9]{1,3}\.){3}[0-9]{1,3}\])|(([\w\-]+\.)+)([a-zA-Z]{2,4}))$/gim);
+  const re = new RegExp(/^([\w\-\+\.]+)@((\[([0-9]{1,3}\.){3}[0-9]{1,3}\])|(([\w\-]+\.)+)([a-zA-Z]{2,4}))$/gim);
   return re.test(addr);
 }
 

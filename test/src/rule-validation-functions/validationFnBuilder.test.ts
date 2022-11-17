@@ -15,7 +15,7 @@ test(`Given a ruleName in ${RULE_NAMES}
   assert.plan(RULE_NAMES.length);
 
   RULE_NAMES.forEach((rule) => {
-    const expected = {value: input, results: [[rule, true]]};
+    const expected = new ValidationState(input, [], [rule]);
     const actual = validationFnBuilder(rule, alwaysTrueValidator)(validationState);
     assert.deepEquals(actual, expected, `value: ${input} should pass ${rule} validation`);
   });

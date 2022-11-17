@@ -12,22 +12,24 @@ test('Creating Maybe instances', (assert) => {
   );
 });
 
-test('If Maybe wraps empty string, undefined or null value Then it should be Nothing', (assert) => {
-  assert.plan(4);
+test('If Maybe wraps empty string, undefined, null, empty array or empty object Then it should be Nothing', (assert) => {
+  assert.plan(6);
 
   assert.true(Maybe.of('').isNothing, 'Empty string should be Nothing');
   assert.true(Maybe.of(undefined).isNothing, 'undefined should be Nothing');
   assert.true(Maybe.of(null).isNothing, 'null should be Nothing');
+  assert.true(Maybe.of([]).isNothing, 'empty array should be Nothing');
+  assert.true(Maybe.of({}).isNothing, 'empty object should be Nothing');
   assert.false(Maybe.of('a').isNothing, 'any value other than null, undefined, empty string should not be Nothing');
 });
 
 test('inspect function should return string representation of Maybe', (assert) => {
-  assert.plan(5);
+  assert.plan(4);
 
   assert.equals(Maybe.of('a').inspect(), 'Maybe("a")');
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   assert.equals(Maybe.of(() => {}).inspect(), 'Maybe(() => { })');
   assert.equals(Maybe.of({a: 1}).inspect(), 'Maybe({"a":1})');
-  assert.equals(Maybe.of([]).inspect(), 'Maybe([])');
   assert.equals(Maybe.of(null).inspect(), 'Nothing');
 });
 
@@ -62,7 +64,7 @@ test('bind should apply the function passed as arg to the wrapped value and shou
 
   assert.equals(
     actualValidation.inspect(),
-    'Validation({"value":"Test","results":[]})',
+    'Validation({"value":"Test","failed":[],"successful":[]})',
     'bind should return the monad returned by the function which was passed as arg ater applied to the value wrapped by Maybe'
   );
   assert.equals(
@@ -83,7 +85,7 @@ test('ap should apply the function wrapped by the Maybe to the value wrapped by 
 
   assert.equals(
     actual.inspect(),
-    'Validation({"value":"Test","results":[]})',
+    'Validation({"value":"Test","failed":[],"successful":[]})',
     "ap should return the Monad wrapping the value returned by the Maybe's function applied to the value wrapped by Monad passed as arg"
   );
   assert.equals(

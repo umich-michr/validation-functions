@@ -1,7 +1,9 @@
 import test from 'tape';
 import {isNotEmpty} from '../../../main/src/value-validation-functions';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const EMPTY_INPUTS: readonly any[] = [null, undefined, '', [], {}];
+// eslint-disable-next-line @typescript-eslint/no-empty-function,@typescript-eslint/no-explicit-any
 const NOT_EMPTY_INPUTS: readonly any[] = ['a', ['a'], {a: 1}, 2, () => {}];
 
 test('isNotEmpty Tests', (assert) => {

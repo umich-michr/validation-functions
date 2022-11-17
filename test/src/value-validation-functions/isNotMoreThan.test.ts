@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import test from 'tape';
-import {isNotMoreThan, isNotEmpty} from '../../../main/src/value-validation-functions';
+import {isNotMoreThan} from '../../../main/src/value-validation-functions';
 
 const EMPTY_INPUTS = [null, undefined, '', [], {}];
 const testCountFromInput = (inputs: [number, any[]][]) => inputs.reduce((acc, inputSet) => acc + inputSet[1].length, 0);
@@ -39,6 +40,7 @@ test('isNotMoreThan Tests', (assert) => {
   assert.test(
     'should throw error for unsupported input types (anything other than string, number, array, object whose entries can be counted)',
     (assert) => {
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
       const INVALID_INPUTS: [number, any[]][] = [[10, [Symbol(), () => {}]]];
 
       assert.plan(testCountFromInput(INVALID_INPUTS));

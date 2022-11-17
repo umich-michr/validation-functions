@@ -1,6 +1,6 @@
 import {ValidationRuleName, ValidationRuleOption, ValidationRules, ValidatorFunction} from './index';
 import {Validation, ValidationState} from './Validation';
-import {isEmail, isNotMoreThan, isNotEmpty} from './value-validation-functions';
+import {isEmail, isNotEmpty, isNotMoreThan} from './value-validation-functions';
 import {Maybe} from './Maybe';
 /* eslint-disable @typescript-eslint/no-explicit-any*/
 export const RULE_NAMES = ['required', 'email', 'maxLength'] as const;
@@ -8,22 +8,16 @@ export const RULE_NAMES = ['required', 'email', 'maxLength'] as const;
 export function validationFnBuilder(ruleName: ValidationRuleName, validatorFn: ValidatorFunction) {
   return (validation: ValidationState): ValidationState => {
     const valid = validatorFn(validation.value);
-    const results = validation.results.concat([[ruleName, valid]]);
-    return {...validation, results};
+    // const results = validation.results.concat([[ruleName, valid]]);
+    // return new ValidationState(validation.value, validation.results.concat(results));
+    const failed = !valid ? validation.failed.concat(ruleName) : validation.failed;
+    const successful = valid ? validation.successful.concat(ruleName) : validation.successful;
+    return new ValidationState(validation.value, failed, successful);
   };
 }
 
 function identityValidationFnBuilder(ruleName: ValidationRuleName) {
   return validationFnBuilder(ruleName, () => true);
-}
-
-export function transformToIgnoreEmptyInput(validatorFn: ValidatorFunction) {
-  return (val: any) => {
-    return (Maybe.of(val).map(validatorFn) as Maybe<any>).fork(
-      () => true,
-      (val: any) => val
-    );
-  };
 }
 
 type RuleApplicator = (options: ValidationRuleOption) => (validationState: ValidationState) => ValidationState;
@@ -37,10 +31,9 @@ function getRuleApplicator(
       options.value ? validationFnBuilder('required', isNotEmpty) : identityValidationFnBuilder('required'),
     email: (options) =>
       options.value
-        ? validationFnBuilder('email', transformToIgnoreEmptyInput(isEmail))
+        ? validationFnBuilder('email', (val: string) => !val || isEmail(val))
         : identityValidationFnBuilder('email'),
-    maxLength: (options) =>
-      validationFnBuilder('maxLength', transformToIgnoreEmptyInput(isNotMoreThan(options.value as number)))
+    maxLength: (options) => validationFnBuilder('maxLength', isNotMoreThan(options.value as number))
   };
   return Maybe.of(ruleApplicators[ruleName]).ap(Maybe.of(options)) as Maybe<(val: any) => ValidationState>;
 }
@@ -56,7 +49,7 @@ function applyRules(
   const [ruleName, ruleOptions] = input[index];
   const newValidation = getRuleApplicator(ruleName, ruleOptions)
     .catchMap(() => {
-      return Maybe.of((v: Validation) => v);
+      return Maybe.of((v: ValidationState) => v);
     })
     .ap(validation) as Validation;
   return applyRules(input, newValidation, index + 1);

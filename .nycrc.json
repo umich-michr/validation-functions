@@ -12,9 +12,10 @@
     "dist",
     "node-modules"
   ],
+  "report-dir": "./test-results/coverage",
   "reporter": [
     "text",
-    "lcov"
+    "html"
   ],
   "cache": false
 }

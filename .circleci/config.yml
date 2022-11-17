@@ -1,0 +1,34 @@
+# Use the latest 2.1 version of CircleCI pipeline process engine. See: https://circleci.com/docs/2.0/configuration-reference
+version: 2.1
+
+orbs:
+  node: circleci/node@5.0.3
+jobs:
+  build-and-test:
+    docker:
+      - image: cimg/node:19.0.1
+    working_directory: ~/project
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: npm
+      - run:
+          name: Run build
+          command: npm run build
+      - run:
+          name: Run test
+          command: npm run test:junit
+      - run:
+          name: Run coverage
+          command: npm run coverage
+      - store_test_results:
+          path: test-results
+      - store_artifacts:
+          path: test-results/coverage
+
+workflows:
+  # Inside the workflow, you provide the jobs you want to run, e.g this workflow runs the build-and-test job above.
+  # CircleCI will run this workflow on every commit. See the configuration docs: https://circleci.com/docs/2.0/configuration-reference/#workflows
+  coverage:
+    jobs:
+      - build-and-test
