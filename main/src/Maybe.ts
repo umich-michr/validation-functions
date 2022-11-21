@@ -28,9 +28,10 @@ export class Maybe<T> implements Monad<T> {
   }
 
   inspect() {
-    return this.isNothing
-      ? 'Nothing'
-      : typeof this.value === 'function'
+    if (this.isNothing) {
+      return 'Nothing';
+    }
+    return typeof this.value === 'function'
       ? `Maybe(${this.value.toString()})`
       : `Maybe(${JSON.stringify(this.value)})`;
   }
@@ -39,11 +40,11 @@ export class Maybe<T> implements Monad<T> {
    * Functors apply a function to a wrapped value
    * map :: Monad m => (a -> b) -> m a -> m b
    */
-  map(f: (val: T) => any): Maybe<any> {
+  map(f: (val: NonNullable<T>) => any): Maybe<any> {
     if (this.isNothing) {
       return this;
     }
-    return Maybe.of(f(this.value));
+    return Maybe.of(f(this.value as NonNullable<T>));
   }
 
   /**
@@ -52,7 +53,7 @@ export class Maybe<T> implements Monad<T> {
    * (>>=) : (M T, T → M U) → M U[g] so if mx : M T and f : T → M U, then (mx >>= f) : M U
    * bind/flatMap/chain :: Monad m => (a -> mb ) -> m a -> m b
    */
-  bind(f: (val: T) => Monad<any>): Monad<any> {
+  bind(f: (val: NonNullable<T>) => Monad<any>): Monad<any> {
     if (this.isNothing) {
       return this;
     }
@@ -82,7 +83,7 @@ export class Maybe<T> implements Monad<T> {
    * takes a function that returns a Maybe. It returns output of function if source Maybe is None
    * @param fN function whose output will be returned if the wrapped value is Nothing
    */
-  catchMap(fN: () => any) {
+  catchMap(fN: () => Monad<any>) {
     if (this.isNothing) {
       return fN();
     }

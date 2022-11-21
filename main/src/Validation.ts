@@ -24,7 +24,9 @@ export class Validation implements Monad<ValidationState | ((val: any) => any)> 
     }
   }
   static of(val: any | ((val: any) => any)) {
-    return typeof val !== 'function' ? new Validation(new ValidationState(val)) : new Validation(val);
+    return val instanceof ValidationState || typeof val === 'function'
+      ? new Validation(val)
+      : new Validation(new ValidationState(val));
   }
   inspect() {
     if (typeof this.validation === 'function') {

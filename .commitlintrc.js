@@ -49,7 +49,7 @@ module.exports = {
     useEmoji: false,
     emojiAlign: 'center',
     themeColorCode: '',
-    scopes: ['rule-validations','value-validations', 'unitTest', 'projectSetup'],
+    scopes: ['rule-validations','value-validations', 'error-messages', 'unitTest', 'projectSetup'],
     enableMultipleScopes: true,
     scopeEnumSeparator: ',',
     allowCustomScopes: false,

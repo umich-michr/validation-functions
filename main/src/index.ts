@@ -3,7 +3,7 @@ import {RULE_NAMES} from './rule-validation-functions';
 export type ValidationRuleName = typeof RULE_NAMES[number];
 
 export type ValidationRules = {
-  [key in ValidationRuleName]?: {value: boolean | number};
+  [key in ValidationRuleName]?: {value: boolean | number; errorMessage?: string};
 };
 
 export type ValidationRuleOption = Exclude<ValidationRules[keyof ValidationRules], undefined>;
