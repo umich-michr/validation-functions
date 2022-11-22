@@ -1,5 +1,5 @@
 import test from 'tape';
-import {validate} from '../../../main/src/rule-validation-functions';
+import {validate} from '../../../main/src';
 
 test('Given a non-existent rule When validate is called on a value Then validation result should be returned as is', (assert) => {
   const input = '  ';

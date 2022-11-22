@@ -89,22 +89,24 @@ test('ap should apply the function wrapped by the Maybe to the value wrapped by 
     "ap should return the Monad wrapping the value returned by the Maybe's function applied to the value wrapped by Monad passed as arg"
   );
   assert.equals(
-    Maybe.of('').ap(validation).inspect(),
-    'Nothing',
-    'ap should return Nothing if the wrapped value corresponds to Nothing'
+    Maybe.of('').ap(validation),
+    validation,
+    'ap should return the argument as is if the wrapped value corresponds to Nothing'
   );
 });
 
 test('catchMap should return the value returned by function arg if Maybe resolves to Nothing otherwise returns the Maybe', (assert) => {
-  const actualValue = Maybe.of('test').catchMap(() => 'will not run');
-  const actualNothing = Maybe.of(null).catchMap(() => 'will run');
+  const expectedNothing = Maybe.of('will run');
+  const expectedSomething = Maybe.of('test');
+  const actualValue = expectedSomething.catchMap(() => Maybe.of('will not run'));
+  const actualNothing = Maybe.of(null).catchMap(() => expectedNothing);
 
   assert.plan(2);
 
-  assert.equals(actualValue, actualValue, 'catchMap should return the Maybe as is if it is not Nothing');
+  assert.equals(actualValue, expectedSomething, 'catchMap should return the Maybe as is if it is not Nothing');
   assert.equals(
     actualNothing,
-    'will run',
+    expectedNothing,
     'catchMap should return the return value of function passed as argument if Maybe resolve to Nothing'
   );
 });

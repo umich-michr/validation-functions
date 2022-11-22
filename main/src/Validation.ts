@@ -20,7 +20,7 @@ export class Validation implements Monad<ValidationState | ((val: any) => any)> 
   constructor(val: ValidationState | ((val: any) => any)) {
     this.validation = val;
     if (typeof val !== 'function') {
-      this.isValid = val.failed.length === 0; //!val.results.find(([, result]) => !result);
+      this.isValid = val.failed.length === 0;
     }
   }
   static of(val: any | ((val: any) => any)) {
@@ -49,7 +49,7 @@ export class Validation implements Monad<ValidationState | ((val: any) => any)> 
   }
 
   map(fn: (val: ValidationState) => any): Monad<any> {
-    return this.bind((val) => new Validation(fn(val)));
+    return this.bind((val) => new Validation(fn(val))) as Monad<any>;
   }
 
   reduceFail<T>(fn: (acc: T, element: ValidationRuleName) => T, accInitial: T): T | undefined {

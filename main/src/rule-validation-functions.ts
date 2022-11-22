@@ -25,7 +25,7 @@ type RuleApplicator = (options: ValidationRuleOption) => (validationState: Valid
 function getRuleApplicator(
   ruleName: ValidationRuleName,
   options: ValidationRuleOption
-): Maybe<(val: any) => ValidationState> {
+): (validationState: ValidationState) => ValidationState {
   const ruleApplicators: {[key in ValidationRuleName]: RuleApplicator} = {
     required: (options) =>
       options.value ? validationFnBuilder('required', isNotEmpty) : identityValidationFnBuilder('required'),
@@ -35,7 +35,8 @@ function getRuleApplicator(
         : identityValidationFnBuilder('email'),
     maxLength: (options) => validationFnBuilder('maxLength', isNotMoreThan(options.value as number))
   };
-  return Maybe.of(ruleApplicators[ruleName]).ap(Maybe.of(options)) as Maybe<(val: any) => ValidationState>;
+  return ruleApplicators[ruleName] ? ruleApplicators[ruleName](options) : (v: ValidationState) => v;
+  // return Maybe.of(ruleApplicators[ruleName]).ap(Maybe.of(options)) as Maybe<(val: any) => ValidationState>;
 }
 
 function applyRules(
@@ -47,11 +48,11 @@ function applyRules(
     return validation;
   }
   const [ruleName, ruleOptions] = input[index];
-  const newValidation = getRuleApplicator(ruleName, ruleOptions)
-    .catchMap(() => {
-      return Maybe.of((v: ValidationState) => v);
-    })
-    .ap(validation) as Validation;
+  const newValidation = validation.map(getRuleApplicator(ruleName, ruleOptions)) as Validation;
+  // .catchMap(() => {
+  //   return Maybe.of((v: ValidationState) => v);
+  // })
+  // .ap(validation) as Validation;
   return applyRules(input, newValidation, index + 1);
 }
 
@@ -63,7 +64,7 @@ const isSupportedType = (val: any) =>
 
 export const validate =
   (rules: ValidationRules) =>
-  (value: string | number | any[] | Record<string, unknown>): Validation => {
+  (value: any): Validation => {
     if (!isSupportedType(value)) {
       throw Error('Can not validate input other than string, number, array or object');
     }

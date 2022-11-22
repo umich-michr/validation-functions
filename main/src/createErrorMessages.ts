@@ -9,8 +9,8 @@ export const DEFAULT_ERROR_MESSAGES: {[key in ValidationRuleName]: string} = {
   maxLength: 'This value is too long. It should have {value} characters or fewer.'
 };
 
-function tmpl(pattern: string) {
-  return (data: ValidationRuleOption) =>
+function tmpl(data: ValidationRuleOption) {
+  return (pattern: string) =>
     (Object.keys(data) as Array<keyof ValidationRuleOption>).reduce(
       (str, key) => str.replace(new RegExp(`{${key}}`, 'g'), data[key] as string),
       pattern
@@ -19,10 +19,13 @@ function tmpl(pattern: string) {
 
 function createErrMsgFrom(rules: ValidationRules, defaultErrorMessages: {[key in ValidationRuleName]?: string}) {
   return (ruleName: ValidationRuleName) => {
-    const msgMaybe = Maybe.of(rules[ruleName]?.errorMessage)
-      .catchMap(() => Maybe.of(defaultErrorMessages[ruleName]))
+    const msgMaybe = Maybe.of(rules[ruleName])
       .map(tmpl)
-      .ap(Maybe.of(rules[ruleName])) as Maybe<string>;
+      .ap(Maybe.of(rules[ruleName]?.errorMessage ?? defaultErrorMessages[ruleName])) as Maybe<string>;
+    // const msgMaybe = Maybe.of(rules[ruleName]?.errorMessage)
+    //   .catchMap(() => Maybe.of(defaultErrorMessages[ruleName]))
+    //   .map(tmpl)
+    //   .ap(Maybe.of(rules[ruleName])) as Maybe<string>;
 
     return msgMaybe.fork(
       () => "Couldn't find validation error message. Check rule definitions or the default error messages.",

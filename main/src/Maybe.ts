@@ -67,7 +67,7 @@ export class Maybe<T> implements Monad<T> {
    */
   ap(otherMonad: Monad<any>): Monad<any> {
     if (this.isNothing) {
-      return this;
+      return otherMonad;
     }
     return otherMonad.map(this.value as (val: T) => unknown);
   }
