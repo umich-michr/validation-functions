@@ -65,7 +65,7 @@ test('bind should apply the function passed as arg to the wrapped value and shou
   assert.equals(
     actualValidation.inspect(),
     'Validation({"value":"Test","failed":[],"successful":[]})',
-    'bind should return the monad returned by the function which was passed as arg ater applied to the value wrapped by Maybe'
+    'bind should return the monad returned by the function which was passed as arg and applied to the value wrapped by Maybe'
   );
   assert.equals(
     Maybe.of('').bind(fn).inspect(),
@@ -75,7 +75,8 @@ test('bind should apply the function passed as arg to the wrapped value and shou
 });
 
 test('ap should apply the function wrapped by the Maybe to the value wrapped by the Monad passed as arg and return the result in a new Maybe', (assert) => {
-  const fn = (val: any) => new ValidationState(val.value[0].toUpperCase() + val.value.slice(1, val.value.length + 1));
+  const fn = (val: {value: string[]}) =>
+    new ValidationState(val.value[0].toUpperCase() + val.value.slice(1, val.value.length + 1));
   const fnMaybe = Maybe.of(fn);
   const validation = Validation.of('test');
 
@@ -114,11 +115,11 @@ test('catchMap should return the value returned by function arg if Maybe resolve
 test('fork should accept 2 functions and run and return the result of the first if Maybe resolves to Nothing otherwise should apply the second function to the wrapped value and return the result', (assert) => {
   const actualValue = Maybe.of('test').fork(
     () => 'will not run 1st fn',
-    (val: any) => `will run the 2nd fn with the val: ${val}`
+    (val: string) => `will run the 2nd fn with the val: ${val}`
   );
   const actualNothing = Maybe.of('').fork(
     () => 'will run 1st fn',
-    (val: any) => 'will not run the 2nd fn'
+    () => 'will not run the 2nd fn'
   );
 
   assert.plan(2);

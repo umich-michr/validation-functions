@@ -1,15 +1,13 @@
 import {ValidationRuleName, ValidationRuleOption, ValidationRules, ValidatorFunction} from './index';
 import {Validation, ValidationState} from './Validation';
 import {isEmail, isNotEmpty, isNotMoreThan} from './value-validation-functions';
-import {Maybe} from './Maybe';
 /* eslint-disable @typescript-eslint/no-explicit-any*/
 export const RULE_NAMES = ['required', 'email', 'maxLength'] as const;
 
 export function validationFnBuilder(ruleName: ValidationRuleName, validatorFn: ValidatorFunction) {
   return (validation: ValidationState): ValidationState => {
     const valid = validatorFn(validation.value);
-    // const results = validation.results.concat([[ruleName, valid]]);
-    // return new ValidationState(validation.value, validation.results.concat(results));
+
     const failed = !valid ? validation.failed.concat(ruleName) : validation.failed;
     const successful = valid ? validation.successful.concat(ruleName) : validation.successful;
     return new ValidationState(validation.value, failed, successful);
@@ -36,7 +34,6 @@ function getRuleApplicator(
     maxLength: (options) => validationFnBuilder('maxLength', isNotMoreThan(options.value as number))
   };
   return ruleApplicators[ruleName] ? ruleApplicators[ruleName](options) : (v: ValidationState) => v;
-  // return Maybe.of(ruleApplicators[ruleName]).ap(Maybe.of(options)) as Maybe<(val: any) => ValidationState>;
 }
 
 function applyRules(
@@ -49,10 +46,7 @@ function applyRules(
   }
   const [ruleName, ruleOptions] = input[index];
   const newValidation = validation.map(getRuleApplicator(ruleName, ruleOptions)) as Validation;
-  // .catchMap(() => {
-  //   return Maybe.of((v: ValidationState) => v);
-  // })
-  // .ap(validation) as Validation;
+
   return applyRules(input, newValidation, index + 1);
 }
 

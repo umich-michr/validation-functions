@@ -3,7 +3,7 @@ import {ValidationState} from '../../../main/src/Validation';
 import {RULE_NAMES, validationFnBuilder} from '../../../main/src/rule-validation-functions';
 
 const input = 'a@b.com';
-const alwaysTrueValidator = (val: any) => true;
+const alwaysTrueValidator = () => true;
 
 test(`Given a ruleName in ${RULE_NAMES}
               And a fn of ${alwaysTrueValidator}

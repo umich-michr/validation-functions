@@ -1,7 +1,7 @@
 import test from 'tape';
 import {curry} from '../../main/src/utils';
 
-test('Multiple argument function should be curried=>Turned into single arg functions returning other single argument functions untill all args are passed', (assert) => {
+test('Multiple argument function should be curried=>Turned into single arg functions returning other single argument functions until all args are passed', (assert) => {
   const sum = (a: number, b: number, c: number) => a + b + c;
   const curriedSum = curry(sum);
 

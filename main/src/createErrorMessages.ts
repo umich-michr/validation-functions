@@ -22,10 +22,6 @@ function createErrMsgFrom(rules: ValidationRules, defaultErrorMessages: {[key in
     const msgMaybe = Maybe.of(rules[ruleName])
       .map(tmpl)
       .ap(Maybe.of(rules[ruleName]?.errorMessage ?? defaultErrorMessages[ruleName])) as Maybe<string>;
-    // const msgMaybe = Maybe.of(rules[ruleName]?.errorMessage)
-    //   .catchMap(() => Maybe.of(defaultErrorMessages[ruleName]))
-    //   .map(tmpl)
-    //   .ap(Maybe.of(rules[ruleName])) as Maybe<string>;
 
     return msgMaybe.fork(
       () => "Couldn't find validation error message. Check rule definitions or the default error messages.",

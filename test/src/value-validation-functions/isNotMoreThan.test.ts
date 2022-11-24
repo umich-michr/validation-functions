@@ -25,7 +25,7 @@ test('isNotMoreThan Tests', (assert) => {
   assert.test('should return false when the string arg length is greater than max length arg', (assert) => {
     const INVALID_INPUTS: [number, any[]][] = [
       [0, ['a', 1, ['a', 'b'], {a: 1, b: 2}]],
-      [3, ['abcd', 1.23, ['a', 'b', 'c', 'd'], {a: 1, b: 1, c: 1, d: 1}]]
+      [3, ['rose', 1.23, ['r', 'b', 'c', 'd'], {a: 1, b: 1, c: 1, d: 1}]]
     ];
 
     assert.plan(testCountFromInput(INVALID_INPUTS));

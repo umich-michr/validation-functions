@@ -52,7 +52,7 @@ export function isNotEmpty(val: unknown): boolean {
     case 'function':
       return true;
     default:
-      throw new Error("typeofValue returned unknown type which we dont't know how to check if it's empty or not");
+      throw new Error("typeofValue returned unknown type which we don't know how to check if it's empty or not");
   }
 }
 

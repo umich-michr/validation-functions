@@ -7,7 +7,6 @@ const VALIDATION_RULE: ValidationRules = {[RULE_NAME]: {value: true}};
 
 const INVALID_INPUTS = [null, undefined, '', '   ', [], {}];
 const VALID_INPUTS = ['a', 5, ['a'], {a: 1}];
-const NOT_SUPPORTED_INPUTS = [() => {}, Symbol()];
 
 test(`${RULE_NAME} validation should return true when not enabled for invalid value: ${INVALID_INPUTS[0]}`, (assert) => {
   const expectedResult = true;
