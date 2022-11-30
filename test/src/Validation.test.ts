@@ -1,11 +1,11 @@
 import test from 'tape';
-import {Validation, ValidationState} from '../../main/src/Validation';
+import {Validation, ValidationResult} from '../../main/src/Validation';
 import {ValidationRuleName} from '../../main/src';
 /* eslint-disable @typescript-eslint/no-empty-function */
 
 test('Validation should create a validation object using a simple value', (assert) => {
   const value = 5;
-  const expected = `Validation(${JSON.stringify(new ValidationState(value))})`;
+  const expected = `Validation(${JSON.stringify(new ValidationResult(value))})`;
 
   const actual = Validation.of(value);
 
@@ -24,8 +24,8 @@ test('Validation should create a validation object using a function as a value',
 });
 
 test('Validation should be valid when all of the validation result values are set to true', (assert) => {
-  const allTrue = new ValidationState('jdoe@gmail.com', [], ['required', 'email', 'maxLength']);
-  const noValidationResult = new ValidationState('jdoe@gmail.com');
+  const allTrue = new ValidationResult('jdoe@gmail.com', [], ['required', 'email', 'maxLength']);
+  const noValidationResult = new ValidationResult('jdoe@gmail.com');
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   const functionInput = () => {};
 
@@ -37,13 +37,13 @@ test('Validation should be valid when all of the validation result values are se
 });
 
 test('Validation should be invalid when any of the validation result values are set to false', (assert) => {
-  const onlyOneValidationFalse = new ValidationState('', ['required']);
-  const allFalse = new ValidationState('', ['required', 'email', 'maxLength']);
-  const onlyTheFirstFalse = new ValidationState('a', ['required'], ['email', 'maxLength']);
-  const onlyTheSecondFalse = new ValidationState('a', ['email'], ['required', 'maxLength']);
-  const onlyTheThirdFalse = new ValidationState('a', ['maxLength'], ['required', 'email']);
-  const onlyTheFirstTwoFalse = new ValidationState('a', ['required', 'email'], ['maxLength']);
-  const onlyTheLastTwoFalse = new ValidationState('a', ['email', 'maxLength'], ['required']);
+  const onlyOneValidationFalse = new ValidationResult('', ['required']);
+  const allFalse = new ValidationResult('', ['required', 'email', 'maxLength']);
+  const onlyTheFirstFalse = new ValidationResult('a', ['required'], ['email', 'maxLength']);
+  const onlyTheSecondFalse = new ValidationResult('a', ['email'], ['required', 'maxLength']);
+  const onlyTheThirdFalse = new ValidationResult('a', ['maxLength'], ['required', 'email']);
+  const onlyTheFirstTwoFalse = new ValidationResult('a', ['required', 'email'], ['maxLength']);
+  const onlyTheLastTwoFalse = new ValidationResult('a', ['email', 'maxLength'], ['required']);
   [
     onlyOneValidationFalse,
     allFalse,
@@ -61,7 +61,7 @@ test('Validation should be invalid when any of the validation result values are 
 });
 
 test('Given a function that will return a monad When bind is called Then the function should be applied to the wrapped value and the monad return value should be returned', (assert) => {
-  const fn = (a: ValidationState) => new Validation(new ValidationState(a.value * 5));
+  const fn = (a: ValidationResult) => new Validation(new ValidationResult((a.value as number) * 5));
   const expected = 'Validation({"value":25,"failed":[],"successful":[]})';
 
   const actual = Validation.of(5).bind(fn);
@@ -71,7 +71,7 @@ test('Given a function that will return a monad When bind is called Then the fun
 });
 
 test('Given a function that will return a monad When bind is called on a Validation wrapping a function Then the the same validation should be returned', (assert) => {
-  const fn = (a: ValidationState) => new Validation(new ValidationState(a.value * 5));
+  const fn = (a: ValidationResult) => new Validation(new ValidationResult((a.value as number) * 5));
   const expected = Validation.of(() => {});
 
   const actual = expected.bind(fn);
@@ -81,7 +81,7 @@ test('Given a function that will return a monad When bind is called on a Validat
 });
 
 test('Given a function that will return a new value When map is called Then the function should be applied to the wrapped value and Validation object wrapping the new value should be returned', (assert) => {
-  const fn = (a: ValidationState) => new ValidationState(a.value * 5);
+  const fn = (a: ValidationResult) => new ValidationResult((a.value as number) * 5);
   const expected = 'Validation({"value":25,"failed":[],"successful":[]})';
 
   const actual = Validation.of(5).map(fn);
@@ -91,7 +91,7 @@ test('Given a function that will return a new value When map is called Then the 
 });
 
 test('Given a function that will return a new value When map is called on a validation wrapping a function Then the same Validation object should be returned', (assert) => {
-  const fn = (a: ValidationState) => new ValidationState(a.value * 5);
+  const fn = (a: ValidationResult) => new ValidationResult((a.value as number) * 5);
   const expected = Validation.of(() => {});
 
   const actual = expected.map(fn);
@@ -101,7 +101,7 @@ test('Given a function that will return a new value When map is called on a vali
 });
 
 test("Given wrapped value is a function that will return a new value and a Monad is passed When ap is called Then the wrapped function should be applied to the wrapped value of the Monad and a Monad with the function's output value should be returned", (assert) => {
-  const fn = (a: ValidationState) => new ValidationState(a.value * 5);
+  const fn = (a: ValidationResult) => new ValidationResult((a.value as number) * 5);
 
   const actual = new Validation(fn).ap(Validation.of(5));
   const expected = 'Validation({"value":25,"failed":[],"successful":[]})';
@@ -111,7 +111,7 @@ test("Given wrapped value is a function that will return a new value and a Monad
 });
 
 test('Given wrapped value is not a function When Validation.ap is called Then an error should be raised', (assert) => {
-  const fn = new ValidationState('not a function');
+  const fn = new ValidationResult('not a function');
 
   assert.throws(
     () => new Validation(fn).ap(Validation.of(5)),
@@ -123,7 +123,7 @@ test('Given wrapped value is not a function When Validation.ap is called Then an
 });
 
 test('reduceFail should allow for reducing all failed validation results into one return value', (assert) => {
-  const validationState = new ValidationState('not a function', ['required', 'maxLength'], ['email']);
+  const validationState = new ValidationResult('not a function', ['required', 'maxLength'], ['email']);
   const validation = new Validation(validationState);
   const messages: {[key in ValidationRuleName]: string} = {
     required: 'requiredMsg',

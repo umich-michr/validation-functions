@@ -1,12 +1,12 @@
 import test from 'tape';
 import {ValidationRules} from '../../main/src';
-import {Validation, ValidationState} from '../../main/src/Validation';
+import {Validation, ValidationResult} from '../../main/src/Validation';
 import {createErrorMessages, DEFAULT_ERROR_MESSAGES} from '../../main/src/createErrorMessages';
 
 test('Generate error messages from Validation object with user supplied error messages', (assert) => {
   assert.plan(1);
 
-  const validationState = new ValidationState(5, ['required', 'email', 'maxLength']);
+  const validationState = new ValidationResult(5, ['required', 'email', 'maxLength']);
   const validation = Validation.of(validationState);
   const rules: Required<ValidationRules> = {
     required: {value: true, errorMessage: 'You missed this required field'},
@@ -20,7 +20,7 @@ test('Generate error messages from Validation object with user supplied error me
     rules.maxLength.errorMessage?.replace('{value}', rules.maxLength.value.toString())
   ];
 
-  const actual = createErrorMessages(rules, DEFAULT_ERROR_MESSAGES)(validation);
+  const actual = createErrorMessages(rules)(validation);
 
   assert.deepEquals(actual, expected, `email and maxLength error messages should be displayed as: ${expected}`);
 });
@@ -28,7 +28,7 @@ test('Generate error messages from Validation object with user supplied error me
 test('Generate error messages from Validation object with no user specified error message using default message', (assert) => {
   assert.plan(1);
 
-  const validation = Validation.of(new ValidationState(5, ['required', 'email', 'maxLength']));
+  const validation = Validation.of(new ValidationResult(5, ['required', 'email', 'maxLength']));
   const rules = {required: {value: true}, email: {value: true}, maxLength: {value: 2}};
   const defaultErrorMessages = {
     required: 'You missed this required field',
@@ -55,7 +55,7 @@ test('Generate error messages from Validation object with non-existent rule', (a
 
   // to test non-existent rules impact on the code ignored ts type check
   // @ts-ignore
-  const validation = Validation.of(new ValidationState(5, ['non-existent rule']));
+  const validation = Validation.of(new ValidationResult(5, ['non-existent rule']));
   const rules: ValidationRules = {required: {value: true}};
   const expected = ["Couldn't find validation error message. Check rule definitions or the default error messages."];
 
@@ -71,7 +71,7 @@ test('Generate error messages from Validation object with non-existent rule', (a
 test('Generate error messages from Validation object with no user specified error message or default message', (assert) => {
   assert.plan(1);
 
-  const validation = Validation.of(new ValidationState(5, ['required']));
+  const validation = Validation.of(new ValidationResult(5, ['required']));
   const rules: ValidationRules = {required: {value: true}};
   const expected = ["Couldn't find validation error message. Check rule definitions or the default error messages."];
 

@@ -2,23 +2,24 @@
 /* eslint-disable no-useless-escape */
 // noinspection RegExpRedundantEscape
 
-function isEmptyString(str: string): boolean {
+import {ValidationValueType} from './index';
+
+const isEmptyString = (str: string): boolean => {
   return !str.trim().length;
-}
+};
 
-function isEmptyArray(arr: Array<string | number | Date>): boolean {
-  return !arr?.length;
-}
+const isEmptyArray = (arr: Array<string | number | Date>): boolean => {
+  return !arr.length;
+};
 
-function isEmptyObject(obj: Record<string, unknown>): boolean {
+const isEmptyObject = (obj: Record<string, unknown>): boolean => {
   return !Object.keys(obj).length;
-}
+};
 
 const VALUE_TYPES = ['undefined', 'null', 'string', 'number', 'array', 'object', 'function', 'unknown'] as const;
 type ValidationType = typeof VALUE_TYPES[number];
 
-//eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function typeofValue(val: any): ValidationType {
+export const typeofValue = (val: unknown): ValidationType => {
   return val === undefined
     ? 'undefined'
     : val === null
@@ -34,10 +35,9 @@ export function typeofValue(val: any): ValidationType {
     : Object(val) === val
     ? 'object'
     : 'unknown';
-}
+};
 
-export function isNotEmpty(val: null | undefined | [] | Record<string, unknown> | ''): false;
-export function isNotEmpty(val: unknown): boolean {
+export const isNotEmpty = (val: unknown): boolean => {
   switch (typeofValue(val)) {
     case 'string':
       return !isEmptyString(val as string);
@@ -54,21 +54,26 @@ export function isNotEmpty(val: unknown): boolean {
     default:
       throw new Error("typeofValue returned unknown type which we don't know how to check if it's empty or not");
   }
-}
+};
 
 /**
  * False returned if the email address is not following the expected format
  * Regex is courtesy of: David Lott at https://www.regexlib.com/RETester.aspx?regexp_id=88 (tweaked it to pass our tests)
  * @param addr Email address in string format
  */
-export function isEmail(addr: string): boolean {
+export const isEmail = (addr: string): boolean => {
+  if (!addr) {
+    return true;
+  }
   const re = new RegExp(/^([\w\-\+\.]+)@((\[([0-9]{1,3}\.){3}[0-9]{1,3}\])|(([\w\-]+\.)+)([a-zA-Z]{2,4}))$/gim);
   return re.test(addr);
-}
+};
 
-export function isNotMoreThan(maxLength: number) {
-  //eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return (val: string | number | any[]): boolean => {
+export const isNotMoreThan = (maxLength: number) => {
+  return (val: ValidationValueType): boolean => {
+    if (isNaN(maxLength)) {
+      throw Error('You should specify maxLength value as number. e.g.: {maxLength: {value: 5}');
+    }
     switch (typeofValue(val)) {
       case 'string':
       case 'array':
@@ -90,4 +95,4 @@ export function isNotMoreThan(maxLength: number) {
         );
     }
   };
-}
+};

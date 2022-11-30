@@ -1,6 +1,6 @@
 import test from 'tape';
 import {Maybe} from '../../main/src/Maybe';
-import {Validation, ValidationState} from '../../main/src/Validation';
+import {Validation, ValidationResult} from '../../main/src/Validation';
 
 test('Creating Maybe instances', (assert) => {
   assert.plan(2);
@@ -76,7 +76,7 @@ test('bind should apply the function passed as arg to the wrapped value and shou
 
 test('ap should apply the function wrapped by the Maybe to the value wrapped by the Monad passed as arg and return the result in a new Maybe', (assert) => {
   const fn = (val: {value: string[]}) =>
-    new ValidationState(val.value[0].toUpperCase() + val.value.slice(1, val.value.length + 1));
+    new ValidationResult(val.value[0].toUpperCase() + val.value.slice(1, val.value.length + 1));
   const fnMaybe = Maybe.of(fn);
   const validation = Validation.of('test');
 

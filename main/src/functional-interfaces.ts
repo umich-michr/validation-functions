@@ -1,12 +1,11 @@
-/* eslint-disable @typescript-eslint/no-explicit-any*/
-export interface Functor<T, R> {
-  map: (fn: (val: T) => any) => R;
+export interface Functor {
+  map: (fn: (val: unknown) => unknown) => unknown;
 }
 export interface Applicative<R> {
   ap: (val: R) => R;
 }
 // Monad m => (a -> mb ) -> m a -> m b
-export interface Monad<A> extends Functor<A, Monad<any>>, Applicative<Monad<any>> {
-  bind: (fn: (val: A) => Monad<any>) => Monad<any>;
+export interface Monad extends Functor, Applicative<Monad> {
+  bind: (fn: (val: unknown) => Monad) => Monad;
   inspect: () => string;
 }

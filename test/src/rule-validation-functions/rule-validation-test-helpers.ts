@@ -1,11 +1,11 @@
 import {Test} from 'tape';
-import {Validation, ValidationState} from '../../../main/src/Validation';
-import {ValidationRuleName, ValidationRules} from '../../../main/src';
+import {Validation, ValidationResult} from '../../../main/src/Validation';
+import {ValidationRuleName, ValidationRules, ValidationValueType} from '../../../main/src';
 import {validate} from '../../../main/src';
 
 function* validationGenerator(
-  valueIterator: IterableIterator<unknown>,
-  results: [ValidationRuleName, boolean][] | IterableIterator<ValidationState>
+  valueIterator: IterableIterator<ValidationValueType>,
+  results: [ValidationRuleName, boolean][] | IterableIterator<ValidationResult>
 ): Generator<Validation> {
   const nextVal = valueIterator.next();
   const res = Array.isArray(results) ? results : results.next().value;
@@ -15,7 +15,7 @@ function* validationGenerator(
 
   const failed = res.filter((r: unknown[]) => !r[1]).map((r: unknown[]) => r[0]);
   const success = res.filter((r: unknown[]) => r[1]).map((r: unknown[]) => r[0]);
-  yield new Validation(new ValidationState(nextVal.value, failed, success));
+  yield new Validation(new ValidationResult(nextVal.value, failed, success));
   yield* validationGenerator(valueIterator, results);
 }
 
@@ -25,12 +25,13 @@ function* expectedGenerator(
 ): Generator<Validation> {
   const res = (Array.isArray(results[0][0]) ? results[Symbol.iterator]() : results) as
     | [ValidationRuleName, boolean][]
-    | IterableIterator<ValidationState>;
-  yield* validationGenerator(values[Symbol.iterator](), res);
+    | IterableIterator<ValidationResult>;
+  const valueIterator = values[Symbol.iterator]() as IterableIterator<ValidationValueType>;
+  yield* validationGenerator(valueIterator, res);
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function testValidationFor(values: any[], rules: ValidationRules) {
+export const testValidationFor = (values: any[], rules: ValidationRules) => {
   return {
     setExpectation(results: [ValidationRuleName, boolean][] | [ValidationRuleName, boolean][][]) {
       const expectedValidations = expectedGenerator(values, results);
@@ -53,4 +54,4 @@ export function testValidationFor(values: any[], rules: ValidationRules) {
       };
     }
   };
-}
+};

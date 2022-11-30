@@ -2,6 +2,8 @@ import test from 'tape';
 import {isEmail} from '../../../main/src/value-validation-functions';
 
 const VALID_INPUTS = [
+  null,
+  undefined,
   'a@b.com',
   'jdoe@michr.med.umich.edu',
   'SoMebody-_123@umich.edu',
@@ -9,8 +11,6 @@ const VALID_INPUTS = [
   '_a----+124@b.com'
 ];
 const INVALID_INPUTS = [
-  null,
-  undefined,
   [],
   {},
   '  ',

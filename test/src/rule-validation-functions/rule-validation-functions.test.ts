@@ -1,7 +1,7 @@
 import test from 'tape';
-import {RULE_NAMES, validate} from '../../../main/src/rule-validation-functions';
+import {RULE_NAMES} from '../../../main/src/rule-validation-functions';
 import {testValidationFor} from './rule-validation-test-helpers';
-import {ValidationRuleName} from '../../../main/src';
+import {validate, ValidationRuleName} from '../../../main/src';
 
 //validation rules are generated from the constant ruleNames to makes ure whatever rules will be added or discarded can be caught by tests.
 const VALIDATION_RULES = RULE_NAMES.reduce(

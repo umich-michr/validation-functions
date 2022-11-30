@@ -3,8 +3,7 @@
 //monads: you apply a function that returns a wrapped value, to a wrapped value using >>= or liftM
 import {Monad} from './functional-interfaces';
 
-/* eslint-disable @typescript-eslint/no-explicit-any*/
-export class Maybe<T> implements Monad<T> {
+export class Maybe<T> implements Monad {
   private readonly value: T;
   readonly isNothing: boolean;
 
@@ -23,10 +22,6 @@ export class Maybe<T> implements Monad<T> {
     return new Maybe<T>(val);
   }
 
-  private join() {
-    return this.value;
-  }
-
   inspect() {
     if (this.isNothing) {
       return 'Nothing';
@@ -40,11 +35,12 @@ export class Maybe<T> implements Monad<T> {
    * Functors apply a function to a wrapped value
    * map :: Monad m => (a -> b) -> m a -> m b
    */
-  map(f: (val: NonNullable<T>) => any): Maybe<any> {
+  map(fn: (val: NonNullable<T>) => unknown): Maybe<unknown> {
     if (this.isNothing) {
       return this;
     }
-    return Maybe.of(f(this.value as NonNullable<T>));
+    const f = (val: NonNullable<T>) => new Maybe(fn(val));
+    return this.bind(f) as Maybe<unknown>;
   }
 
   /**
@@ -53,11 +49,11 @@ export class Maybe<T> implements Monad<T> {
    * (>>=) : (M T, T → M U) → M U[g] so if mx : M T and f : T → M U, then (mx >>= f) : M U
    * bind/flatMap/chain :: Monad m => (a -> mb ) -> m a -> m b
    */
-  bind(f: (val: NonNullable<T>) => Monad<any>): Monad<any> {
+  bind(fn: (val: NonNullable<T>) => Monad): Monad {
     if (this.isNothing) {
       return this;
     }
-    return this.map(f).join();
+    return fn(this.value as NonNullable<T>);
   }
 
   /**
@@ -65,14 +61,14 @@ export class Maybe<T> implements Monad<T> {
    * when this.value is a function, ap applies that function to the maybe passed as argument and returns the resulting maybe
    * ap :: Monad m => m (a -> b) -> m a -> m b
    */
-  ap(otherMonad: Monad<any>): Monad<any> {
+  ap(otherMonad: Monad): Monad {
     if (this.isNothing) {
       return otherMonad;
     }
-    return otherMonad.map(this.value as (val: T) => unknown);
+    return otherMonad.map(this.value as (val: unknown) => unknown) as Monad;
   }
 
-  fork(fN: () => any, fS: (val: T) => any) {
+  fork(fN: () => unknown, fS: (val: T) => unknown) {
     if (this.isNothing) {
       return fN();
     }
@@ -83,7 +79,7 @@ export class Maybe<T> implements Monad<T> {
    * takes a function that returns a Maybe. It returns output of function if source Maybe is None
    * @param fN function whose output will be returned if the wrapped value is Nothing
    */
-  catchMap(fN: () => Monad<any>) {
+  catchMap(fN: () => Monad) {
     if (this.isNothing) {
       return fN();
     }

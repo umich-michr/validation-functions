@@ -1,55 +1,57 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {Monad} from './functional-interfaces';
-import {ValidationRuleName} from './index';
+import {ValidationRuleName, ValidationValueType} from './index';
 
-/* eslint-disable @typescript-eslint/no-explicit-any*/
-export class ValidationState {
-  readonly value: any;
+export class ValidationResult {
+  readonly value: ValidationValueType;
   readonly failed: ValidationRuleName[];
   readonly successful: ValidationRuleName[];
-  constructor(val: any, failed: ValidationRuleName[] = [], successful: ValidationRuleName[] = []) {
+  constructor(val: ValidationValueType, failed: ValidationRuleName[] = [], successful: ValidationRuleName[] = []) {
     this.value = val;
     this.failed = failed;
     this.successful = successful;
   }
 }
 
-export class Validation implements Monad<ValidationState | ((val: any) => any)> {
-  private readonly validation: ValidationState | ((val: any) => any);
+export class Validation implements Monad {
+  private readonly validation: ValidationResult | ((val: any) => any);
   readonly isValid: boolean = true;
-  // private readonly currentValidation: ValidationRuleName;
-  constructor(val: ValidationState | ((val: any) => any)) {
+  constructor(val: ValidationResult | ((val: any) => any)) {
     this.validation = val;
     if (typeof val !== 'function') {
       this.isValid = val.failed.length === 0;
     }
   }
-  static of(val: any | ((val: any) => any)) {
-    return val instanceof ValidationState || typeof val === 'function'
+
+  static of(val: ValidationValueType | ValidationResult | ((val: any) => any)) {
+    return val instanceof ValidationResult || typeof val === 'function'
       ? new Validation(val)
-      : new Validation(new ValidationState(val));
+      : new Validation(new ValidationResult(val));
   }
+
   inspect() {
     if (typeof this.validation === 'function') {
       return `Validation(${this.validation.toString()})`;
     }
     return `Validation(${JSON.stringify(this.validation)})`;
   }
-  ap(otherMonad: Monad<any>): Monad<any> {
+
+  ap(otherMonad: Monad): Monad {
     if (typeof this.validation === 'function') {
-      return otherMonad.map(this.validation);
+      return otherMonad.map(this.validation) as Monad;
     }
     throw new Error("If validation doesn't wrap a function then it can not be applied on another Monad");
   }
 
-  bind(fn: (val: ValidationState) => Monad<any>): Monad<any> {
+  bind(fn: (val: any) => Monad): Monad {
     if (typeof this.validation === 'function') {
       return this;
     }
     return fn(this.validation);
   }
 
-  map(fn: (val: ValidationState) => any): Monad<any> {
-    return this.bind((val) => new Validation(fn(val))) as Monad<any>;
+  map(fn: (val: any) => any): Monad {
+    return this.bind((val) => new Validation(fn(val)));
   }
 
   reduceFail<T>(fn: (acc: T, element: ValidationRuleName) => T, accInitial: T): T | undefined {

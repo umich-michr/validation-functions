@@ -15,7 +15,7 @@
     "moduleResolution": "node",
     // Process & infer types from .js files.
     "allowJs": true,
-    // Enable strictest settings like strictNullChecks & noImplicitAny.
+    // Enable the strictest settings like strictNullChecks & noImplicitAny.
     "strict": true,
     // Ensure that Babel can safely transpile files in the TypeScript project. Disallow features that require cross-file information for emit.
     "isolatedModules": true,
@@ -28,10 +28,6 @@
     "declarationMap": true, // go to js file when using IDE functions like Go to Definition in VSCode,
     "sourceMap": true
   },
-  "exclude": [
-    "node_modules",
-    "dist"
-  ],
   "ts-node": {
     // these options are overrides used only by ts-node
     "compilerOptions": {
