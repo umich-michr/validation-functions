@@ -74,6 +74,7 @@ export const isNotMoreThan = (maxLength: number) => {
     if (isNaN(maxLength)) {
       throw Error('You should specify maxLength value as number. e.g.: {maxLength: {value: 5}');
     }
+    //ts-ignore are added from switch case statemnt because typescript compiler couldn't understand switch case was making sure that val.toString() will not run into error.
     switch (typeofValue(val)) {
       case 'string':
       case 'array':
@@ -86,6 +87,7 @@ export const isNotMoreThan = (maxLength: number) => {
       case 'null':
         return true;
       case 'number':
+        // @ts-ignore
         return val.toString().length <= maxLength;
       default:
         throw new Error(

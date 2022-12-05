@@ -68,21 +68,10 @@ export class Maybe<T> implements Monad {
     return otherMonad.map(this.value as (val: unknown) => unknown) as Monad;
   }
 
-  fork(fN: () => unknown, fS: (val: T) => unknown) {
+  fork<R>(fN: () => R, fS: (val: T) => R) {
     if (this.isNothing) {
       return fN();
     }
     return fS(this.value);
-  }
-
-  /**
-   * takes a function that returns a Maybe. It returns output of function if source Maybe is None
-   * @param fN function whose output will be returned if the wrapped value is Nothing
-   */
-  catchMap(fN: () => Monad) {
-    if (this.isNothing) {
-      return fN();
-    }
-    return this;
   }
 }

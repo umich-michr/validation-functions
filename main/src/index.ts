@@ -6,7 +6,7 @@ export type ValidationRules = {
   [key in ValidationRuleName]?: {value: boolean | number; errorMessage?: string};
 };
 
-export type ValidationValueType = string | number | (string | number)[] | Record<string, unknown>;
+export type ValidationValueType = string | number | (string | number)[] | Record<string, unknown> | undefined;
 
 export type ValidationRuleOption = Exclude<ValidationRules[keyof ValidationRules], undefined>;
 

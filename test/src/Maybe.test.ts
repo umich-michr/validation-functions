@@ -58,7 +58,7 @@ test('bind should apply the function passed as arg to the wrapped value and shou
   const fn = (val: string) => Validation.of(val[0].toUpperCase() + val.slice(1, val.length + 1));
   const testMaybe = Maybe.of('test');
 
-  const actualValidation = testMaybe.bind(fn);
+  const actualValidation = testMaybe.bind(fn) as Maybe<string>;
 
   assert.plan(2);
 
@@ -67,8 +67,10 @@ test('bind should apply the function passed as arg to the wrapped value and shou
     'Validation({"value":"Test","failed":[],"successful":[]})',
     'bind should return the monad returned by the function which was passed as arg and applied to the value wrapped by Maybe'
   );
+
+  const actualEmptyStringValidation = Maybe.of('').bind(fn) as Validation;
   assert.equals(
-    Maybe.of('').bind(fn).inspect(),
+    actualEmptyStringValidation.inspect(),
     'Nothing',
     'bind should return Nothing if the wrapped value corresponds to Nothing'
   );
@@ -80,7 +82,7 @@ test('ap should apply the function wrapped by the Maybe to the value wrapped by 
   const fnMaybe = Maybe.of(fn);
   const validation = Validation.of('test');
 
-  const actual = fnMaybe.ap(validation);
+  const actual = fnMaybe.ap(validation) as Maybe<typeof fnMaybe>;
 
   assert.plan(2);
 
@@ -93,22 +95,6 @@ test('ap should apply the function wrapped by the Maybe to the value wrapped by 
     Maybe.of('').ap(validation),
     validation,
     'ap should return the argument as is if the wrapped value corresponds to Nothing'
-  );
-});
-
-test('catchMap should return the value returned by function arg if Maybe resolves to Nothing otherwise returns the Maybe', (assert) => {
-  const expectedNothing = Maybe.of('will run');
-  const expectedSomething = Maybe.of('test');
-  const actualValue = expectedSomething.catchMap(() => Maybe.of('will not run'));
-  const actualNothing = Maybe.of(null).catchMap(() => expectedNothing);
-
-  assert.plan(2);
-
-  assert.equals(actualValue, expectedSomething, 'catchMap should return the Maybe as is if it is not Nothing');
-  assert.equals(
-    actualNothing,
-    expectedNothing,
-    'catchMap should return the return value of function passed as argument if Maybe resolve to Nothing'
   );
 });
 

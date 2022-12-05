@@ -64,7 +64,7 @@ test('Given a function that will return a monad When bind is called Then the fun
   const fn = (a: ValidationResult) => new Validation(new ValidationResult((a.value as number) * 5));
   const expected = 'Validation({"value":25,"failed":[],"successful":[]})';
 
-  const actual = Validation.of(5).bind(fn);
+  const actual = Validation.of(5).bind(fn) as Validation;
 
   assert.equals(actual.inspect(), expected);
   assert.end();
@@ -84,7 +84,7 @@ test('Given a function that will return a new value When map is called Then the 
   const fn = (a: ValidationResult) => new ValidationResult((a.value as number) * 5);
   const expected = 'Validation({"value":25,"failed":[],"successful":[]})';
 
-  const actual = Validation.of(5).map(fn);
+  const actual = Validation.of(5).map(fn) as Validation;
 
   assert.equals(actual.inspect(), expected);
   assert.end();
@@ -103,7 +103,7 @@ test('Given a function that will return a new value When map is called on a vali
 test("Given wrapped value is a function that will return a new value and a Monad is passed When ap is called Then the wrapped function should be applied to the wrapped value of the Monad and a Monad with the function's output value should be returned", (assert) => {
   const fn = (a: ValidationResult) => new ValidationResult((a.value as number) * 5);
 
-  const actual = new Validation(fn).ap(Validation.of(5));
+  const actual = new Validation(fn).ap(Validation.of(5)) as Validation;
   const expected = 'Validation({"value":25,"failed":[],"successful":[]})';
 
   assert.equals(actual.inspect(), expected);
